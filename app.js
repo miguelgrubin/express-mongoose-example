@@ -6,12 +6,37 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var lessMiddleware = require('less-middleware');
 var mongoose = require('mongoose');
+var helmet = require('helmet');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var api = require('./routes/api');
 
 var app = express();
+
+// Securiry Middleware
+//  - DNS Prefetch Control
+//  - X-Frame-Options (clickjacking)
+//  - Hide Powered-By
+//  - Strict-Transport-Security
+//  - X-Download-Options (prevent file downloads opening for IE >= 8)
+//  - X-XSS-Protection
+//  - X-Content-Type-Options (prevents content type sniffing for IE >= 9)
+//  - Referrer-Policy
+//  - Content Security Policy
+// 
+app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    styleSrc: ["'self'"],
+    mediaSrc: ["'self"],
+    imgSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    frameSrc: ["'none'"]
+  }
+}));
+app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
 
 // DB connection
 mongoose.connect('mongodb://localhost:27017/myapp');
